@@ -1,0 +1,94 @@
+
+<style type="text/css">
+    html, a, div, body, h1, h2, p, ul, li {
+        font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
+    }
+    body {
+        background: #355886;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    #hv.a:hover {
+        color: #22cb72;
+    }
+
+    #hv.a:active {
+        color: #16cb4a;
+    }
+
+    #hv.a:link {
+        color: green;
+    }
+
+    body > .grid {
+        height: 100%;
+    }
+    .image {
+        margin-top: -100px;
+    }
+    .column {
+        max-width: 550px;
+    }
+
+    #input-container {
+        background: rgba(255, 255, 255, 255);
+        padding: 20pt;
+        width: 400px;
+        alignment: center;
+
+        -webkit-box-shadow: 5px 5px 3px 0px rgba(20, 20, 20, 0.25);
+        -moz-box-shadow: 5px 5px 3px 0px rgba(20, 20, 20, 0.25);
+        box-shadow: 5px 5px 3px 0px rgba(20, 20, 20, 0.25);
+
+        border-radius: 5px;
+    }
+</style>
+
+<div class="ui grid"  align="center">
+  <div id="input-container" class="column">
+    <h2 class="ui header">
+      <div class="content" style="padding-top: 8pt; font-size: 24pt; color: rgba(64, 98, 156, 0.85)">
+        Connect Four Game
+      </div>
+    </h2>
+    <div class="ui form">
+      <div class="field">
+        <div class="ui left icon input">
+          <label style="color: rgba(37, 51, 80, 0.96); padding-right: 25pt" for="Player1 Name">Player 1:</label>
+          <input type="text" autocomplete="off" placeholder="Player 1" id="Player1 Name">
+          <i class="user icon"></i>
+        </div>
+      </div>
+      <div>&nbsp;</div>
+      <div class="field">
+        <div class="ui left icon input">
+          <label style="color: rgba(37, 51, 80, 0.96); padding-right: 25pt" for="Player2 Name">Player 2:</label>
+          <input type="text" autocomplete="off" placeholder="Player 2" id="Player2 Name">
+          <div>&nbsp;</div>
+          <label><input type="checkbox" id="AsComputer"> Player 2 As Computer</label>
+          <i class="lock icon"></i>
+        </div>
+      </div>
+    </div>
+    <div>&nbsp;</div>
+    <%= form_for("home", :html => {class: 'ui form', autocomplete: 'off', id: 'homeForm'}, :url => {:action=>"startgame"}, :method => "POST") do |f| %>
+        <input type="hidden" name="player1" id="hiddenplayer1">
+        <input type="hidden" name="player2" id="hiddenplayer2">
+        <input type="hidden" name="ascomputer" id="hiddenascomputer">
+        <button class="ui submit button" type="submit" onclick="startgame()">Start Game</button>
+    <% end %>
+  </div>
+</div>
+
+
+<script type="text/javascript" language="JavaScript">
+    function startgame(){
+        document.getElementById('hiddenplayer1').value = document.getElementById('Player1 Name').value;
+        document.getElementById('hiddenplayer2').value = document.getElementById('Player2 Name').value;
+        document.getElementById('hiddenascomputer').value = document.getElementById('AsComputer').value;
+        document.getElementById('loginForm').submit();
+    }
+</script>

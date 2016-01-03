@@ -1,0 +1,478 @@
+<style>
+    body{
+        background: #BBBBBB;
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:5px;
+    }
+
+
+    #status{
+        float: right;
+        width: 300px;
+        padding-top: 80px;
+    }
+    #game-status{
+        max-height: 450px;
+        height: 450px;
+        overflow-x: auto;
+    }
+
+    #container{
+        width: 800px;
+        margin: 0 auto;
+        padding-top: 80px;
+    }
+
+    #game{
+        background: url("/images/board.png") 0 0 no-repeat;
+        width: 640px;
+        height: 480px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .turn{
+        position: absolute;
+        z-index: -1;
+        top: -80px;
+        left: 16px;
+        width: 68px;
+        height: 68px;
+        border-radius: 68px;
+        transition: all .3s;
+    }
+
+    .turn.green{
+        background: #16cb4a;
+    }
+
+    .turn.red{
+        background: #B00100;
+    }
+</style>
+<div class="ui grid"  style="float: left;">
+  <div id="input-container" class="column">
+    <h2 class="ui header">
+      <div class="content" style="padding-top: 8pt; font-size: 24pt; color: rgba(64, 98, 156, 0.85)">
+        Connect Four Game
+      </div>
+    </h2>
+    <div class="ui form">
+      <div class="field">
+        <div class="ui left icon input">
+          <label style="color: rgba(37, 51, 80, 0.96); padding-right: 25pt" for="Player1 Name">Player 1:</label>
+          <input type="text" autocomplete="off" placeholder="Player 1" id="Player1 Name">
+          <i class="user icon"></i>
+        </div>
+      </div>
+      <div>&nbsp;</div>
+      <div class="field">
+        <div class="ui left icon input">
+          <label style="color: rgba(37, 51, 80, 0.96); padding-right: 25pt" for="Player2 Name">Player 2:</label>
+          <input type="text" autocomplete="off" placeholder="Player 2" id="Player2 Name">
+          <div>&nbsp;</div>
+          <label><input type="checkbox" id="AsComputer"> Player 2 As Computer</label>
+          <i class="lock icon"></i>
+        </div>
+      </div>
+    </div>
+    <div>&nbsp;</div>
+    <button class="ui button" type="button" onclick="startnewgame()">Start Game</button>
+  </div>
+</div>
+<div id="status">
+  <p>Game Status:</p>
+  <p id="game-status" style="border-style: solid;">
+  </p>
+</div>
+<div id="container">
+  <h1 id="player-turn-indicator">Start A New Game</h1>
+  <div id="game">
+
+  </div>
+</div>
+
+<script type="text/javascript" language="JavaScript">
+    //declaration of variables
+    var activeCol, activeRow, activePlayer;
+    var colArrays = ["A", "B", "C", "D", 'E', "F", "G"];
+    var id = 1;
+    var computer;
+    var player1Name;
+    var player2Name;
+    var gameended = 0;
+    var turnArray = new Array();
+    var player1Turn = new Array();
+    var player2Turn = new Array();
+    var tmpPlayerTurn = new Array();
+    var winningTurns = new Array();
+
+    
+    function startnewgame()
+    {
+        computer = document.getElementById('AsComputer').checked;
+        player1Name = document.getElementById('Player1 Name').value;
+        player2Name = document.getElementById('Player2 Name').value;
+        player1Name = player1Name == '' ? 'Player 1' : player1Name;
+        player2Name = player2Name == '' ? 'Player 2' : player2Name;
+        player1Turn = new Array();
+        player2Turn = new Array();
+
+        var r = confirm('Start a new game?');
+        if (r == true)
+        {
+            document.getElementById("game").innerHTML = "";
+            document.getElementById("game-status").innerHTML = "";
+            gameended = 0;
+            startgame();
+        }
+    }
+
+    function startgame()
+    {
+        initArray(6, 7);
+        var randomNumber = Math.floor(Math.random()*2)+1;
+        startTurn(randomNumber);
+    }
+
+    // to initialize multi dimensional array
+    function initArray(row, column)
+    {
+        turnArray = new Array();
+        for(var i=0; i<row; i++)
+        {
+            turnArray[i] = new Array();
+            for(var j=0; j<column; j++)
+            {
+                turnArray[i].push(0);
+            }
+        }
+    }
+    function checkWinnerStatus(turnField, player)
+    {
+        tmpPlayerTurn = new Array();
+        var tmp1, tmp2, cnt1, cnt2;
+        var tmpWinner = false;
+        if (player == 1)
+        {
+            tmpPlayerTurn = player1Turn
+        }
+        else
+        {
+            tmpPlayerTurn = player2Turn
+        }
+        var totalCount;
+        for(var i = 1; i <= 4; i++)
+        {
+            totalCount = 0;
+            winningTurns = new Array();
+            winningTurns.push(turnField);
+            tmp1 = false;
+            tmp2 = false;
+            for(var y = 1; y <= 3; y++)
+            {
+                switch(i)
+                {
+                    case 1:
+                        cnt1 = tmp1 == true ? 0 : checkNextTurnField(turnField, 0, y*1)
+                        if(cnt1 == 0)
+                        {
+                            tmp1 = true
+                        }
+                        cnt2 = tmp2 == true ? 0 : checkNextTurnField(turnField, 0, y*-1);
+                        if(cnt2 == 0)
+                        {
+                            tmp2 == true
+                        }
+                        totalCount += cnt1 + cnt2;
+                        break;
+                    case 2:
+                        cnt1 = tmp1 == true ? 0 : checkNextTurnField(turnField, y*1, 0);
+                        if(cnt1 == 0)
+                        {
+                            tmp1 = true
+                        }
+                        cnt2 = tmp2 == true ? 0 : checkNextTurnField(turnField, y*-1, 0);
+                        if(cnt2 == 0)
+                        {
+                            tmp2 == true
+                        }
+                        totalCount += cnt1 + cnt2;
+                        break;
+                    case 3:
+                        cnt1 = tmp1 == true ? 0 : checkNextTurnField(turnField, y*1, y*1);
+                        if(cnt1 == 0)
+                        {
+                            tmp1 = true
+                        }
+                        cnt2 = tmp2 == true ? 0 : checkNextTurnField(turnField, y*-1, y*-1);
+                        if(cnt2 == 0)
+                        {
+                            tmp2 == true
+                        }
+                        totalCount += cnt1 + cnt2;
+                        break;
+                    case 4:
+                        cnt1 = tmp1 == true ? 0 : checkNextTurnField(turnField, y*-1, y*1);
+                        if(cnt1 == 0)
+                        {
+                            tmp1 = true
+                        }
+                        cnt2 = tmp2 == true ? 0 : checkNextTurnField(turnField, y*1, y*-1);
+                        if(cnt2 == 0)
+                        {
+                            tmp2 == true
+                        }
+                        totalCount += cnt1 + cnt2;
+                        break;
+                }
+                if (totalCount >= 3)
+                {
+                    break;
+                }
+            }
+            if (totalCount >= 3)
+            {
+                tmpWinner = true;
+                break;
+            }
+        }
+        return tmpWinner;
+    }
+
+    function checkNextTurnField(turnField,row_inc,col_inc)
+    {
+        var nextColumn = colArrays[colArrays.indexOf(turnField.charAt(0))+col_inc]
+        if (nextColumn == 'undefined')
+        {
+            return 0;
+        }
+        var nextRow = (parseInt(turnField.charAt(1)) + row_inc)
+        if (nextRow < 1 || nextRow > 6)
+        {
+            return 0;
+        }
+        var nextTurnField = nextColumn + nextRow;
+        if(tmpPlayerTurn.indexOf(nextTurnField) >= 0)
+        {
+            winningTurns.push(nextTurnField);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+
+    function checkRow(col,player)
+    {
+        for(var i = 0; i<6; i++)
+        {
+            if(turnArray[i][col]!=0)
+            {
+                break;
+            }
+        }
+        turnArray[i-1][col] = player;
+        return i-1;
+    }
+
+    function checkCol()
+    {
+        var col_array = new Array();
+        for(var i=0; i<7; i++)
+        {
+            if(turnArray[0][i] == 0)
+            {
+                col_array.push(i);
+            }
+        }
+        return col_array;
+    }
+
+    function aiTurn()
+    {
+        var possibleMoves = checkCol();
+        var turnField;
+        var aiMoves = new Array();
+        var aiTurn;
+        var bestaiTurn = 0;
+
+        for(var i=0; i<possibleMoves.length; i++)
+        {
+            for(var j=0; j<6; j++)
+            {
+                if(turnArray[j][possibleMoves[i]] != 0)
+                {
+                    break;
+                }
+            }
+            var turnField = colArrays[possibleMoves[i]] + j;
+            turnArray[j-1][possibleMoves[i]] = 1;
+
+            aiTurn = checkNextTurnField(turnField,0,1)+checkNextTurnField(turnField,0,-1);
+            aiTurn = Math.max(aiTurn,checkNextTurnField(turnField,1,0));
+            aiTurn = Math.max(aiTurn,checkNextTurnField(turnField,-1,1));
+            aiTurn = Math.max(aiTurn,checkNextTurnField(turnField,1,1));
+            aiTurn = Math.max(aiTurn,checkNextTurnField(turnField,-1,-1));
+
+            if(aiTurn >= bestaiTurn)
+            {
+                if(aiTurn>bestaiTurn)
+                {
+                    bestaiTurn = aiTurn;
+                    aiMoves = new Array();
+                }
+                aiMoves.push(possibleMoves[i]);
+            }
+            turnArray[j-1][possibleMoves[i]] = 0;
+        }
+
+        return aiMoves;
+    }
+
+    function Turn(player)
+    {
+        this.player = player;
+        this.color = player == 1 ? 'green' : 'red';
+        this.id = id.toString();
+        id++;
+
+        this.initTurn = function()
+        {
+            document.getElementById("game").innerHTML += '<div id="turn'+this.id+'" class="turn '+this.color+'"></div>';
+
+            if(activePlayer == 2 && computer == 1) // for ai
+            {
+                var randomTurn = aiTurn();
+                var aiMove = Math.floor( Math.random() * randomTurn.length);
+
+                activeCol = randomTurn[aiMove];
+
+                document.getElementById('turn'+this.id).style.left = (16+90*activeCol)+"px";
+
+                endTurn(this.id,activePlayer);
+            }
+        }
+
+        var tmpTurn = this;
+
+        document.onmousemove = function(event)
+        {
+            if (gameended == 1)
+            {
+                return;
+            }
+            if(activePlayer == 1 || (activePlayer == 2 && computer == 0 ))
+            {
+                activeCol = Math.floor((event.clientX - document.getElementById("game").offsetLeft)/90);
+                if(activeCol<0)
+                {
+                    activeCol=0;
+                }
+                if(activeCol>6)
+                {
+                    activeCol=6;
+                }
+                document.getElementById('turn'+tmpTurn.id).style.left = (16+90*activeCol)+"px";
+                document.getElementById('turn'+tmpTurn.id).style.top = "-80px";
+            }
+        }
+        document.onclick = function(event)
+        {
+            if (gameended == 1)
+            {
+                return;
+            }
+            if(( event.clientX > 300 && event.clientX < 1050) && (activePlayer == 1 || (activePlayer == 2 && computer == 0 )))
+            {
+                if(checkCol().indexOf(activeCol) != -1)
+                {
+                    endTurn(tmpTurn.id,tmpTurn.player);
+                }
+            }
+        }
+    }
+
+    function endTurn(turnId,player)
+    {
+        activeRow = checkRow(activeCol,player);
+        var playerName = activePlayer == 2 ? player2Name : player1Name + ' (User)';
+        if (activePlayer == 2)
+        {
+            if (computer == 1)
+            {
+                playerName += ' (Computer)';
+            }
+            else
+            {
+                playerName += ' (User)';
+            }
+        }
+
+        var turnField = colArrays[activeCol] + (activeRow+1);
+        document.getElementById("game-status").innerHTML += playerName + ' drop a turn on ' + turnField + '<br>';
+        if (activePlayer == 2)
+        {
+            player2Turn.push(turnField);
+        }
+        else
+        {
+            player1Turn.push(turnField);
+        }
+        dropTurn(turnId,(16+activeRow*78.25 + ((activeRow - 5) * 1.56)));
+        activePlayer = player;
+        validationOnMove();
+    }
+
+    function validationOnMove()
+    {
+        var turnField = colArrays[activeCol] + (activeRow+1);
+       // checkWinnerStatus(turnField, activePlayer);
+        if(!checkWinnerStatus(turnField,activePlayer))
+        {
+            var nextTurn = activePlayer == 2 ? 1 : 2
+            startTurn(nextTurn);
+        }
+        else
+        {
+            var playerName = activePlayer == 2 ? player2Name : player1Name + ' (User)';
+            if (activePlayer == 2)
+            {
+                if (computer == 1)
+                {
+                    playerName += ' (Computer)';
+                }
+                else
+                {
+                    playerName += ' (User)';
+                }
+            }
+            document.getElementById("game-status").innerHTML += playerName + ' wins the game by putting on (' + winningTurns + ')!';
+            document.getElementById('player-turn-indicator').innerHTML = 'Game Ended';
+            gameended = 1
+        }
+    }
+
+    function startTurn(player){
+        activePlayer = player;
+        var turnIndicator = document.getElementById("player-turn-indicator");
+        if (activePlayer == 1){
+            turnIndicator.innerHTML = player1Name + ' Turns';
+        }
+        else{
+            turnIndicator.innerHTML = player2Name + ' Turns';
+        }
+        turnIndicator.scrollTop = turnIndicator.scrollHeight;
+        var turn = new Turn(player);
+        turn.initTurn();
+    }
+
+    function dropTurn(id,to){
+        document.getElementById('turn'+id).style.top = to+'px';
+    }
+</script>

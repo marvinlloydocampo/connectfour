@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="Rails ConnectFour: development" uuid="a892d6a6-a02b-47fb-9cce-f42654cfc40f">
+    <database-info product="" version="" jdbc-version="" driver-name="" driver-version=""/>
+  </data-source>
+  <data-source name="Rails ConnectFour: test" uuid="0ef17653-31bc-41ff-94af-776c6e60985a">
+    <database-info product="" version="" jdbc-version="" driver-name="" driver-version=""/>
+  </data-source>
+  <data-source name="Rails ConnectFour: production" uuid="c8fbc343-7590-48e9-a675-8a532eef3338">
+    <database-info product="" version="" jdbc-version="" driver-name="" driver-version=""/>
+  </data-source>
+</component>
